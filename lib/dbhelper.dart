@@ -86,7 +86,7 @@ class DBHelper {
   updateTodos(Todos todos) async {
     final db = await database;
     var res = db.rawUpdate(
-        'UPDATE $TableName SET content = ? checked = ? WHERE = ?',
+        'UPDATE $TableName SET content = ?, checked = ? WHERE id = ?',
         [todos.content, todos.checked, todos.id]);
     return res;
   }

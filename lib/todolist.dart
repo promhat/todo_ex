@@ -10,17 +10,26 @@ class myTodolist extends StatefulWidget {
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
-  List<Todos> todolist;
+  final _modyController = TextEditingController();
+
+  //List<Todos> todolist;
 
   @override
   void dispose() {
     super.dispose();
     _todoController.dispose();
+    _modyController.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+  }
+
+  void deleteSomeList(int id) {
+    setState(() {
+      DBHelper().deleteTodos(id);
+    });
   }
 
   @override
@@ -116,35 +125,19 @@ class _myTodolistState extends State<myTodolist> {
                       itemBuilder: (BuildContext context, int index) {
                         Todos item = snapshot.data[index];
                         return ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '     ' +
-                                    item.id.toString() +
-                                    '         ' +
-                                    item.content,
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.mode_edit),
-                                    onPressed: () {
-                                      setState(() {});
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      setState(() {
-                                        DBHelper().deleteTodos(item.id);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
+                          leading: Text(item.id.toString()),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Colors.red,
+                            focusColor: Colors.blueGrey,
+                            onPressed: () {
+                              setState(() {
+                                DBHelper().deleteTodos(item.id);
+                              });
+                            },
+                          ),
+                          title: Todotile(
+                            item: item,
                           ),
                         );
                       },
@@ -161,5 +154,106 @@ class _myTodolistState extends State<myTodolist> {
         ),
       ),
     );
+  }
+}
+
+class Todotile extends StatefulWidget {
+  Todotile({Key key, this.item}) : super(key: key);
+  Todos item;
+
+  @override
+  _TodotileState createState() => _TodotileState();
+}
+
+class _TodotileState extends State<Todotile> {
+  bool mody;
+  final _modycon = TextEditingController();
+  bool checked;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mody = false;
+    checked = false;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _modycon.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Checkbox(
+          value: checkreturn(widget.item),
+          onChanged: (bool resp) {
+            setState(() {
+              checked = resp;
+              checkList(widget.item, checked);
+            });
+          },
+        ),
+        if (mody == true)
+          Container(
+            width: 100,
+            child: TextFormField(
+              controller: _modycon,
+            ),
+          )
+        else if (mody == false)
+          if (widget.item.checked == 1)
+            Container(
+              child: Text(
+                widget.item.content,
+                style: TextStyle(
+                  fontSize: 20,
+                  decoration: TextDecoration.lineThrough,
+                ),
+              ),
+            )
+          else
+            Container(
+              child: Text(
+                widget.item.content,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+        IconButton(
+          icon: Icon(Icons.mode_edit),
+          onPressed: () {
+            setState(() {
+              if (mody) {
+                mody = false;
+                Todos temp = widget.item;
+                temp.content = _modycon.text.trim();
+                DBHelper().updateTodos(temp);
+              } else
+                mody = true;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  bool checkreturn(Todos todos) {
+    if (todos.checked == 1)
+      return true;
+    else
+      return false;
+  }
+
+  checkList(Todos todo, bool check) {
+    if (check)
+      todo.checked = 1;
+    else
+      todo.checked = 0;
+    DBHelper().updateTodos(todo);
   }
 }
