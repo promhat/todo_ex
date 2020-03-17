@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:khi_todo/dbhelper.dart';
 import 'package:khi_todo/todo_model.dart';
+import 'package:path/path.dart';
 
 class Todotile extends StatefulWidget {
-  Todotile({Key key, this.item}) : super(key: key);
+  Todotile({Key key, this.item, this.canMody}) : super(key: key);
   Todos item;
+  int canMody;
 
   @override
   _TodotileState createState() => _TodotileState();
@@ -12,9 +15,7 @@ class Todotile extends StatefulWidget {
 
 class _TodotileState extends State<Todotile> {
   bool mody;
-  final _modycon = TextEditingController();
-  bool checked;
-  final _formkey = GlobalKey<FormState>();
+  TextEditingController _modycon;
   FocusNode myFocusNode;
 
   @override
@@ -22,8 +23,8 @@ class _TodotileState extends State<Todotile> {
     // TODO: implement initState
     super.initState();
     mody = false;
-    checked = false;
     myFocusNode = new FocusNode();
+    _modycon = TextEditingController(text: widget.item.content);
   }
 
   @override
@@ -36,85 +37,117 @@ class _TodotileState extends State<Todotile> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build!');
-    return Form(
-      key: _formkey,
-      child: Row(
+    debugPrint('Tile build!');
+    return ListTile(
+      leading: Checkbox(
+        value: checkreturn(widget.item),
+        onChanged: (bool resp) {
+          setState(() {
+            checkList(widget.item, resp);
+          });
+        },
+      ),
+//      trailing: IconButton(
+//        icon: Icon(Icons.edit),
+//        color: Colors.blue,
+//        onPressed: () {
+//          setState(() {
+//            widget.canMody = widget.item.id;
+//            if (widget.canMody == widget.item.id) mody = true;
+//          });
+//        },
+//      ),
+      title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Checkbox(
-            value: checkreturn(widget.item),
-            onChanged: (bool resp) {
-              setState(() {
-                checked = resp;
-                checkList(widget.item, checked);
-              });
-            },
-          ),
           if (mody == true)
-            Container(
-              width: 100,
-              child: TextFormField(
-                controller: _modycon,
-//                autofocus: true,
-                focusNode: myFocusNode,
-                onFieldSubmitted: (String value) {
-                  Todos temp = widget.item;
-                  temp.content = _modycon.text.trim();
-                  DBHelper().updateTodos(temp);
-                  setState(() {
-                    mody = false;
-                  });
-                  debugPrint(value);
-                },
-                textInputAction: TextInputAction.done,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return '수정내용을 입력하세요.';
-                  }
-                  return null;
-                },
-              ),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 150,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: _modycon,
+                    autofocus: true,
+                    focusNode: myFocusNode,
+                    onSubmitted: (String value) {
+                      Todos temp = widget.item;
+                      temp.content = _modycon.text.trim();
+                      DBHelper().updateTodos(temp);
+                      setState(() {
+                        mody = false;
+                      });
+                      debugPrint(value);
+                    },
+                    textInputAction: TextInputAction.done,
+                  ),
+                ),
+                Container(
+                  width: 50,
+                  child: FlatButton(
+                    child: Text('저장'),
+                    onPressed: () {
+                      setState(() {
+                        mody = false;
+                      });
+                      DBHelper().updateTodos(
+                          widget.item.changeContent(_modycon.text.trim()));
+                    },
+                  ),
+                )
+              ],
             )
           else if (mody == false)
             if (widget.item.checked == 1)
               Container(
-                child: Text(
-                  widget.item.content,
-                  style: TextStyle(
-                    fontSize: 20,
-                    decoration: TextDecoration.lineThrough,
+                width: 150,
+                child: FlatButton(
+                  child: Text(
+                    widget.item.content,
+                    style: TextStyle(
+                      fontSize: 20,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                    overflow: TextOverflow.visible,
                   ),
                 ),
               )
             else
-              Container(
+              FlatButton(
                 child: Text(
                   widget.item.content,
                   style: TextStyle(fontSize: 20),
                 ),
-              ),
-          IconButton(
-            icon: Icon(Icons.mode_edit),
-            onPressed: () {
-              myFocusNode.requestFocus();
-              if (mody) {
-                if (_formkey.currentState.validate()) {
-                  Todos temp = widget.item;
-                  temp.content = _modycon.text.trim();
-                  DBHelper().updateTodos(temp);
+                onPressed: () {
                   setState(() {
-                    mody = false;
+                    mody = true;
                   });
-                }
-              } else {
-                setState(() {
-                  mody = true;
-                });
-              }
-//                myFocusNode.requestFocus();
-            },
-          ),
+                  myFocusNode.requestFocus();
+                },
+              ),
+//          IconButton(
+//            icon: Icon(Icons.mode_edit),
+//            onPressed: () {
+//              myFocusNode.requestFocus();
+//              if (mody) {
+//                if (_formkey.currentState.validate()) {
+//                  Todos temp = widget.item;
+//                  temp.content = _modycon.text.trim();
+//                  DBHelper().updateTodos(temp);
+//                  setState(() {
+//                    mody = false;
+//                  });
+//                }
+//              } else {
+//                setState(() {
+//                  mody = true;
+//                });
+//              }
+////                myFocusNode.requestFocus();
+//            },
+//          ),
         ],
       ),
     );

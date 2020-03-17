@@ -12,21 +12,18 @@ class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
   final _modyController = TextEditingController();
-  //List<Todos> todolist;
-  FocusNode editFocusNode;
+  int mody;
 
   @override
   void dispose() {
     super.dispose();
     _todoController.dispose();
     _modyController.dispose();
-    editFocusNode.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    editFocusNode = new FocusNode();
   }
 
   void deleteSomeList(int id) {
@@ -35,8 +32,15 @@ class _myTodolistState extends State<myTodolist> {
     });
   }
 
+  void changeMody(int change) {
+    setState(() {
+      mody = change;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint('List mody ' + mody.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text('Todo List'),
@@ -57,8 +61,6 @@ class _myTodolistState extends State<myTodolist> {
                     width: 200,
                     child: TextFormField(
                       controller: _todoController,
-                      //  autofocus: true,
-                      // focusNode: editFocusNode,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'type your todo list',
@@ -132,7 +134,8 @@ class _myTodolistState extends State<myTodolist> {
                       itemBuilder: (BuildContext context, int index) {
                         Todos item = snapshot.data[index];
                         return ListTile(
-                          leading: Text(item.id.toString()),
+                          // leading: Text(item.id.toString()),
+                          // subtitle: Text(item.id.toString()),
                           trailing: IconButton(
                             icon: Icon(Icons.delete),
                             color: Colors.red,
@@ -145,6 +148,7 @@ class _myTodolistState extends State<myTodolist> {
                           ),
                           title: Todotile(
                             item: item,
+                            canMody: mody,
                           ),
                         );
                       },

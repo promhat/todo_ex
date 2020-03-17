@@ -11,6 +11,11 @@ class Todos {
     this.checked = map[checked];
   }
 
+  Todos changeContent(String con) {
+    this.content = con;
+    return this;
+  }
+
   Map<String, dynamic> tomap() {
     return {'id': id, 'content': content, 'checked': checked};
   }
