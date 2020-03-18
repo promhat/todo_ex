@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:khi_todo/dbhelper.dart';
 import 'package:khi_todo/todo_model.dart';
+import 'package:khi_todo/todolist.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 
 class Todotile extends StatefulWidget {
   Todotile({Key key, this.item, this.canMody}) : super(key: key);
@@ -38,6 +40,8 @@ class _TodotileState extends State<Todotile> {
   @override
   Widget build(BuildContext context) {
     debugPrint('Tile build!');
+
+    final modifier = Provider.of<Modify>(context);
     return ListTile(
       leading: Checkbox(
         value: checkreturn(widget.item),
@@ -60,7 +64,7 @@ class _TodotileState extends State<Todotile> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          if (mody == true)
+          if (modifier.getModify() == widget.item.id)
             Row(
               children: <Widget>[
                 Container(
@@ -91,6 +95,7 @@ class _TodotileState extends State<Todotile> {
                     onPressed: () {
                       setState(() {
                         mody = false;
+                        modifier.setModify(0);
                       });
                       DBHelper().updateTodos(
                           widget.item.changeContent(_modycon.text.trim()));
@@ -99,34 +104,34 @@ class _TodotileState extends State<Todotile> {
                 )
               ],
             )
-          else if (mody == false)
-            if (widget.item.checked == 1)
-              Container(
-                width: 150,
-                child: FlatButton(
-                  child: Text(
-                    widget.item.content,
-                    style: TextStyle(
-                      fontSize: 20,
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
-              )
-            else
-              FlatButton(
+          else if (widget.item.checked == 1)
+            Container(
+              width: 150,
+              child: FlatButton(
                 child: Text(
                   widget.item.content,
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                    fontSize: 20,
+                    decoration: TextDecoration.lineThrough,
+                  ),
+                  overflow: TextOverflow.visible,
                 ),
-                onPressed: () {
-                  setState(() {
-                    mody = true;
-                  });
-                  myFocusNode.requestFocus();
-                },
               ),
+            )
+          else
+            FlatButton(
+              child: Text(
+                widget.item.content,
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                setState(() {
+                  mody = true;
+                  modifier.setModify(widget.item.id);
+                });
+                myFocusNode.requestFocus();
+              },
+            ),
 //          IconButton(
 //            icon: Icon(Icons.mode_edit),
 //            onPressed: () {

@@ -2,17 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:khi_todo/dbhelper.dart';
 import 'package:khi_todo/todo_model.dart';
 import 'package:khi_todo/todoTile.dart';
+import 'package:provider/provider.dart';
 
 class myTodolist extends StatefulWidget {
   @override
   _myTodolistState createState() => _myTodolistState();
 }
 
+class Modify with ChangeNotifier {
+  int _mody;
+  Modify(this._mody);
+  getModify() => _mody;
+//  setModify(int mody) => _mody = mody;
+  setModify(int mody) {
+    _mody = mody;
+
+    debugPrint('setModify ' + _mody.toString());
+  }
+}
+
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
   final _modyController = TextEditingController();
-  int mody;
 
   @override
   void dispose() {
@@ -32,15 +44,12 @@ class _myTodolistState extends State<myTodolist> {
     });
   }
 
-  void changeMody(int change) {
-    setState(() {
-      mody = change;
-    });
+  void modiRender() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('List mody ' + mody.toString());
     return Scaffold(
       appBar: AppBar(
         title: Text('Todo List'),
@@ -146,9 +155,11 @@ class _myTodolistState extends State<myTodolist> {
                               });
                             },
                           ),
-                          title: Todotile(
-                            item: item,
-                            canMody: mody,
+                          title: ChangeNotifierProvider<Modify>(
+                            builder: (_) => Modify(0),
+                            child: Todotile(
+                              item: item,
+                            ),
                           ),
                         );
                       },
