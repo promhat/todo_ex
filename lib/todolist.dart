@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:khi_todo/dbhelper.dart';
-import 'package:khi_todo/todo_model.dart';
 import 'package:khi_todo/todoTile.dart';
+import 'package:khi_todo/todo_model.dart';
 import 'package:provider/provider.dart';
 
 class myTodolist extends StatefulWidget {
@@ -9,6 +9,7 @@ class myTodolist extends StatefulWidget {
   _myTodolistState createState() => _myTodolistState();
 }
 
+// 수정 모드에 있는 리스트 컬럼(데이터베이스) 아이디.
 class Modify with ChangeNotifier {
   int _mody;
   Modify(this._mody);
@@ -16,7 +17,7 @@ class Modify with ChangeNotifier {
 //  setModify(int mody) => _mody = mody;
   setModify(int mody) {
     _mody = mody;
-
+    notifyListeners();
     debugPrint('setModify ' + _mody.toString());
   }
 }
@@ -24,13 +25,11 @@ class Modify with ChangeNotifier {
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
-  final _modyController = TextEditingController();
 
   @override
   void dispose() {
     super.dispose();
     _todoController.dispose();
-    _modyController.dispose();
   }
 
   @override
@@ -42,10 +41,6 @@ class _myTodolistState extends State<myTodolist> {
     setState(() {
       DBHelper().deleteTodos(id);
     });
-  }
-
-  void modiRender() {
-    setState(() {});
   }
 
   @override
@@ -82,6 +77,8 @@ class _myTodolistState extends State<myTodolist> {
                       },
                     ),
                   ),
+                  // 저장버튼
+                  // 폼 Validator 활용, 입력값이 없을 경우 처리 X
                   RaisedButton(
                     child: Text('저장'),
                     onPressed: () {
@@ -99,15 +96,12 @@ class _myTodolistState extends State<myTodolist> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 30,
-            ),
+
             Divider(
-              height: 2,
+              height: 50,
             ),
-            SizedBox(
-              height: 10,
-            ),
+
+            // 중간 메뉴 출력 + 전체삭제 버
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -131,45 +125,44 @@ class _myTodolistState extends State<myTodolist> {
             SizedBox(
               height: 20,
             ),
-            Expanded(
-              child: FutureBuilder(
-                future: DBHelper().getAllTodos(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Todos>> snapshot) {
-                  if (snapshot.hasData) {
-                    debugPrint('snapshot has data');
-                    return ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Todos item = snapshot.data[index];
-                        return ListTile(
-                          // leading: Text(item.id.toString()),
-                          // subtitle: Text(item.id.toString()),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            color: Colors.red,
-                            focusColor: Colors.blueGrey,
-                            onPressed: () {
-                              setState(() {
-                                DBHelper().deleteTodos(item.id);
-                              });
-                            },
-                          ),
-                          title: ChangeNotifierProvider<Modify>(
-                            builder: (_) => Modify(0),
-                            child: Todotile(
+            ChangeNotifierProvider<Modify>(
+              builder: (_) => Modify(0),
+              child: Expanded(
+                child: FutureBuilder(
+                  future: DBHelper().getAllTodos(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Todos>> snapshot) {
+                    if (snapshot.hasData) {
+                      debugPrint('snapshot has data');
+                      return ListView.builder(
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          Todos item = snapshot.data[index];
+                          return ListTile(
+                            // leading: Text(item.id.toString()),
+                            // subtitle: Text(item.id.toString()),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete),
+                              color: Colors.red,
+                              onPressed: () {
+                                setState(() {
+                                  DBHelper().deleteTodos(item.id);
+                                });
+                              },
+                            ),
+                            title: Todotile(
                               item: item,
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                ),
               ),
             ),
           ],
