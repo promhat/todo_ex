@@ -25,6 +25,7 @@ class Modify with ChangeNotifier {
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
+  bool _addTodo;
 
   @override
   void dispose() {
@@ -35,6 +36,7 @@ class _myTodolistState extends State<myTodolist> {
   @override
   void initState() {
     super.initState();
+    _addTodo = false;
   }
 
   void deleteSomeList(int id) {
@@ -43,88 +45,92 @@ class _myTodolistState extends State<myTodolist> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Todo List'),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 50,
-            ),
-            Form(
-              key: _formkey,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text("Todo: "),
-                  Container(
-                    width: 200,
-                    child: TextFormField(
-                      controller: _todoController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'type your todo list',
-                      ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return '할 일을 입력해주세요.';
-                        }
-                        return null;
-                      },
+  Widget addTodo() {
+    if (_addTodo) {
+      return Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          Form(
+            key: _formkey,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text("Todo: "),
+                Container(
+                  width: 200,
+                  child: TextFormField(
+                    controller: _todoController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'type your todo list',
                     ),
-                  ),
-                  // 저장버튼
-                  // 폼 Validator 활용, 입력값이 없을 경우 처리 X
-                  RaisedButton(
-                    child: Text('저장'),
-                    onPressed: () {
-                      setState(() {
-                        if (_formkey.currentState.validate()) {
-                          debugPrint(_todoController.text.trim());
-                          var res = DBHelper()
-                              .createData(_todoController.text.trim());
-                          DBHelper().getTodos(1);
-                          _todoController.clear();
-                        }
-                      });
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return '할 일을 입력해주세요.';
+                      }
+                      return null;
                     },
                   ),
-                ],
-              ),
-            ),
-
-            Divider(
-              height: 50,
-            ),
-
-            // 중간 메뉴 출력 + 전체삭제 버
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.white),
                 ),
-                Text(
-                  'Todays List',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
+                // 저장버튼
+                // 폼 Validator 활용, 입력값이 없을 경우 처리 X
+                RaisedButton(
+                  child: Text('저장'),
                   onPressed: () {
-                    setState(() {
-                      DBHelper().deleteAllTodos();
-                    });
+                    if (_formkey.currentState.validate()) {
+                      debugPrint(_todoController.text.trim());
+                      var res =
+                          DBHelper().createData(_todoController.text.trim());
+                      DBHelper().getTodos(1);
+                      setState(() {
+                        _todoController.clear();
+                        _addTodo = false;
+                      });
+                    }
                   },
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
+          ),
+          Divider(
+            height: 50,
+          ),
+        ],
+      );
+    } else {
+      return SizedBox(
+        height: 30,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Todays List',
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                DBHelper().deleteAllTodos();
+              });
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            addTodo(),
+
+            //프로바이더 사용, Modify값을 자식에서 사용하고 변화를 관찰.
             ChangeNotifierProvider<Modify>(
               builder: (_) => Modify(0),
               child: Expanded(
@@ -157,6 +163,7 @@ class _myTodolistState extends State<myTodolist> {
                         },
                       );
                     } else {
+                      // 리스트 뷰에 표시할 데이터가 없을 경우 원 모양 인디케이터를 표
                       return Center(
                         child: CircularProgressIndicator(),
                       );
@@ -164,6 +171,21 @@ class _myTodolistState extends State<myTodolist> {
                   },
                 ),
               ),
+            ),
+            // Add Mode Toggle Button
+            // Click 시 전체 화면을 Add Mode로 다시 렌더
+            FloatingActionButton(
+              backgroundColor: Colors.amber,
+              onPressed: () {
+                setState(() {
+                  if (_addTodo)
+                    _addTodo = false;
+                  else
+                    _addTodo = true;
+                });
+              },
+              tooltip: 'Image',
+              child: Icon(Icons.add),
             ),
           ],
         ),

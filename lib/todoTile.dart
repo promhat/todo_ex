@@ -40,21 +40,31 @@ class _TodotileState extends State<Todotile> {
     debugPrint('Tile build!');
 
     final modifier = Provider.of<Modify>(context);
-    if (modifier.getModify() == widget.item.id)
+    if (widget.item.checked != 1) {
+      if (modifier.getModify() == widget.item.id)
+        return ListTile(
+          leading: checkComple(),
+          title: letsMody(),
+        );
+      else
+        return ListTile(
+            leading: checkComple(),
+            title: justShow(),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                modifier.setModify(widget.item.id);
+              },
+            ));
+    } else
       return ListTile(
         leading: checkComple(),
-        title: letsMody(),
+        title: Text(
+          widget.item.content,
+          style: TextStyle(
+              decoration: TextDecoration.lineThrough, color: Colors.grey),
+        ),
       );
-    else
-      return ListTile(
-          leading: checkComple(),
-          title: justShow(),
-          trailing: IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              modifier.setModify(widget.item.id);
-            },
-          ));
   }
 
   bool checkreturn(Todos todos) {
@@ -104,7 +114,9 @@ class _TodotileState extends State<Todotile> {
               Todos temp = widget.item;
               temp.content = _modycon.text.trim();
               DBHelper().updateTodos(temp);
-              setState(() {});
+              setState(() {
+                modifier2.setModify(0);
+              });
               debugPrint(value);
             },
             textInputAction: TextInputAction.done,
