@@ -46,23 +46,36 @@ class _TodotileState extends State<Todotile> {
           leading: checkComple(),
           title: letsMody(),
         );
-      else
+      else {
         return ListTile(
             leading: checkComple(),
             title: justShow(),
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                modifier.setModify(widget.item.id);
-              },
-            ));
+            trailing: Wrap(spacing: 2, children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  modifier.setModify(widget.item.id);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.clear),
+                color: Colors.amber,
+                onPressed: () {
+                  setState(() {
+                    DBHelper().deleteAllTodos();
+                  });
+                },
+              ),
+            ]));
+      }
     } else
       return ListTile(
         leading: checkComple(),
         title: Text(
+          //showComple()
           widget.item.content,
           style: TextStyle(
-              decoration: TextDecoration.lineThrough, color: Colors.grey),
+              decoration: TextDecoration.lineThrough, color: Colors.amber),
         ),
       );
   }
@@ -83,14 +96,34 @@ class _TodotileState extends State<Todotile> {
   }
 
   Widget checkComple() {
-    return Checkbox(
-      value: checkreturn(widget.item),
-      onChanged: (bool resp) {
-        setState(() {
-          checkList(widget.item, resp);
-        });
-      },
-    );
+//    return Checkbox(
+//      value: checkreturn(widget.item),
+//      onChanged: (bool resp) {
+//        setState(() {
+//          checkList(widget.item, resp);
+//        });
+//      },
+//    );
+    if (widget.item.checked == 1)
+      return IconButton(
+        icon: Icon(Icons.favorite),
+        color: Colors.amber,
+        onPressed: () {
+          setState(() {
+            checkList(widget.item, false);
+          });
+        },
+      );
+    else
+      return IconButton(
+        icon: Icon(Icons.favorite_border),
+        color: Colors.amber,
+        onPressed: () {
+          setState(() {
+            checkList(widget.item, true);
+          });
+        },
+      );
   }
 
   Widget justShow() {

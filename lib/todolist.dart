@@ -26,11 +26,13 @@ class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
   bool _addTodo;
+  FocusNode myFocusNode;
 
   @override
   void dispose() {
     super.dispose();
     _todoController.dispose();
+    myFocusNode.dispose();
   }
 
   @override
@@ -43,6 +45,18 @@ class _myTodolistState extends State<myTodolist> {
     setState(() {
       DBHelper().deleteTodos(id);
     });
+  }
+
+  void addTodolist() {
+    if (_formkey.currentState.validate()) {
+      debugPrint(_todoController.text.trim());
+      var res = DBHelper().createData(_todoController.text.trim());
+      DBHelper().getTodos(1);
+      setState(() {
+        _todoController.clear();
+        _addTodo = false;
+      });
+    }
   }
 
   Widget addTodo() {
@@ -62,6 +76,8 @@ class _myTodolistState extends State<myTodolist> {
                   width: 200,
                   child: TextFormField(
                     controller: _todoController,
+                    autofocus: true,
+                    focusNode: myFocusNode,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'type your todo list',
@@ -72,24 +88,14 @@ class _myTodolistState extends State<myTodolist> {
                       }
                       return null;
                     },
+                    onEditingComplete: () => addTodolist(),
                   ),
                 ),
                 // 저장버튼
                 // 폼 Validator 활용, 입력값이 없을 경우 처리 X
                 RaisedButton(
                   child: Text('저장'),
-                  onPressed: () {
-                    if (_formkey.currentState.validate()) {
-                      debugPrint(_todoController.text.trim());
-                      var res =
-                          DBHelper().createData(_todoController.text.trim());
-                      DBHelper().getTodos(1);
-                      setState(() {
-                        _todoController.clear();
-                        _addTodo = false;
-                      });
-                    }
-                  },
+                  onPressed: () => addTodolist(),
                 ),
               ],
             ),
@@ -111,19 +117,9 @@ class _myTodolistState extends State<myTodolist> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Todays List',
+          'TODO LIST',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              setState(() {
-                DBHelper().deleteAllTodos();
-              });
-            },
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(
@@ -144,21 +140,8 @@ class _myTodolistState extends State<myTodolist> {
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
                           Todos item = snapshot.data[index];
-                          return ListTile(
-                            // leading: Text(item.id.toString()),
-                            // subtitle: Text(item.id.toString()),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete),
-                              color: Colors.red,
-                              onPressed: () {
-                                setState(() {
-                                  DBHelper().deleteTodos(item.id);
-                                });
-                              },
-                            ),
-                            title: Todotile(
-                              item: item,
-                            ),
+                          return Todotile(
+                            item: item,
                           );
                         },
                       );
@@ -183,6 +166,7 @@ class _myTodolistState extends State<myTodolist> {
                   else
                     _addTodo = true;
                 });
+                FocusScope.of(context).requestFocus();
               },
               tooltip: 'Image',
               child: Icon(Icons.add),
