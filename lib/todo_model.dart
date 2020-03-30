@@ -2,13 +2,16 @@ class Todos {
   int id;
   String content;
   int checked;
+  int delkey;
 
-  Todos({this.id, this.content, this.checked});
+  Todos({this.id, this.content, this.checked, this.delkey});
 
   Todos fromMap(Map<String, dynamic> map) {
     this.id = map[id];
     this.content = map[content];
     this.checked = map[checked];
+
+    this.delkey = map[delkey];
   }
 
   Todos changeContent(String con) {
@@ -17,6 +20,6 @@ class Todos {
   }
 
   Map<String, dynamic> tomap() {
-    return {'id': id, 'content': content, 'checked': checked};
+    return {'id': id, 'content': content, 'checked': checked, 'delkey': delkey};
   }
 }

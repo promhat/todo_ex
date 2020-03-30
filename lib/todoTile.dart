@@ -26,7 +26,6 @@ class _TodotileState extends State<Todotile> {
     myFocusNode = new FocusNode();
     _modycon = TextEditingController(text: widget.item.content);
     _modycon.addListener(checkNum);
-    deldel = false;
   }
 
   void checkNum() {}
@@ -38,11 +37,18 @@ class _TodotileState extends State<Todotile> {
     myFocusNode.dispose();
   }
 
+  bool checkdel() {
+    if (widget.item.delkey == 1)
+      return true;
+    else
+      return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint('Tile build!');
 
-    final deleter = Provider.of<SelectDel>(context);
+    debugPrint(widget.item.tomap().toString());
     if (widget.delMode)
       return ListTile(
         leading: Theme(
@@ -50,16 +56,16 @@ class _TodotileState extends State<Todotile> {
             unselectedWidgetColor: Colors.amber,
           ),
           child: Checkbox(
-            value: deldel,
+            value: checkdel(),
             activeColor: Colors.amber,
-            onChanged: (bool temp) {
-              setState(() {
-                deldel = temp;
-              });
-              if (temp)
-                deleter.addDelList(widget.item.id);
+            onChanged: (bool del) {
+              Todos temp = widget.item;
+              setState(() {});
+              if (del)
+                temp.delkey = 1;
               else
-                deleter.cancleDel(widget.item.id);
+                temp.delkey = 0;
+              DBHelper().updateTodos(temp);
             },
           ),
         ),
@@ -122,13 +128,6 @@ class _TodotileState extends State<Todotile> {
 //        ),
       );
   }
-
-//  bool checkreturn(Todos todos) {
-//    if (todos.checked == 1)
-//      return true;
-//    else
-//      return false;
-//  }
 
   checkList(Todos todo, bool check) {
     if (check)

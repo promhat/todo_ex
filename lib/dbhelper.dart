@@ -26,16 +26,29 @@ class DBHelper {
     //각 플랫폼 별 경로가 제대로 생성되도록 보장할 수 있는 가장 좋은 방법이다.
     String path = join(await getDatabasesPath(), 'MyTodos.db');
     //db 생성
-    return await openDatabase(path, version: 1, onCreate: (db, version) async {
+    return await openDatabase(path, version: 6, onCreate: (db, version) async {
       await db.execute('''
           CREATE TABLE $TableName(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             content TEXT,
-            checked INTEGER DEFAULT 0
+            checked INTEGER DEFAULT 0,
+            delkey INTEGER DEFAULT 0
           )
         ''');
-    }, onUpgrade: (db, oldVersion, newVersion) {});
+    }, onUpgrade: (db, oldVersion, newVersion) {
+//      if (oldVersion < newVersion) {
+//        db.execute(
+//            '''ALTER TABLE $TableName ADD COLUMN delkey INTEGER DEFAULT 0''');
+//      }
+    });
   }
+
+//  void alterTable() async {
+//    final db = await database;
+//    await db.execute(
+//        '''ALTER TABLE $TableName ADD COLUMN delkey INTEGER DEFAULT 0''');
+//    debugPrint('alter!!!!');
+//  }
 
   //Create
   createData(String content) async {
@@ -59,7 +72,8 @@ class DBHelper {
         ? Todos(
             id: res.first['id'],
             content: res.first['content'],
-            checked: res.first['checked'])
+            checked: res.first['checked'],
+            delkey: res.first['delkey'])
         : Null;
   }
 
@@ -76,7 +90,10 @@ class DBHelper {
     List<Todos> list = res.isNotEmpty
         ? res
             .map((c) => Todos(
-                id: c['id'], content: c['content'], checked: c['checked']))
+                id: c['id'],
+                content: c['content'],
+                checked: c['checked'],
+                delkey: c['delkey']))
             .toList()
         : [];
     return list;
@@ -86,8 +103,16 @@ class DBHelper {
   updateTodos(Todos todos) async {
     final db = await database;
     var res = db.rawUpdate(
-        'UPDATE $TableName SET content = ?, checked = ? WHERE id = ?',
-        [todos.content, todos.checked, todos.id]);
+        'UPDATE $TableName SET content = ?, checked = ?,delkey=? WHERE id = ?',
+        [todos.content, todos.checked, todos.delkey, todos.id]);
+    return res;
+  }
+
+  //Update all
+  updateAllDel(int del) async {
+    final db = await database;
+    var res = db.rawUpdate(
+        'UPDATE $TableName SET delkey=? WHERE id IS NOT NULL', [del]);
     return res;
   }
 
@@ -95,6 +120,13 @@ class DBHelper {
   deleteTodos(int id) async {
     final db = await database;
     var res = db.rawDelete('DELETE FROM $TableName WHERE id = ?', [id]);
+    return res;
+  }
+
+  //Delete
+  deleteList() async {
+    final db = await database;
+    var res = db.rawDelete('DELETE FROM $TableName WHERE delkey=1');
     return res;
   }
 

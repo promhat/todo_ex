@@ -22,30 +22,6 @@ class Modify with ChangeNotifier {
   }
 }
 
-class SelectDel with ChangeNotifier {
-  var delList = [];
-  SelectDel(this.delList);
-
-  addDelList(int del) {
-    if (delList.contains(del)) {
-    } else
-      delList.add(del);
-    debugPrint('delList : ' + delList.toString());
-  }
-
-  cancleDel(int del) {
-    delList.remove(del);
-    debugPrint('delList : ' + delList.toString());
-  }
-
-  DeleteList() {
-    for (int i = 0; i < delList.length; i++)
-      DBHelper().deleteTodos(delList.indexOf(i));
-    notifyListeners();
-    delList.clear();
-  }
-}
-
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
@@ -64,27 +40,22 @@ class _myTodolistState extends State<myTodolist> {
   @override
   void initState() {
     super.initState();
+    // DBHelper().alterTable();
     _addTodo = false;
     _delMode = false;
     _delAll = false;
-  }
-
-  void deleteSomeList(int id) {
-    setState(() {
-      DBHelper().deleteTodos(id);
-    });
   }
 
   // 빌드
   @override
   Widget build(BuildContext context) {
     //프로바이더 사용, 현재 컨텍스트 값을 자식에서 사용하고 변화를 관찰.
+    //DBHelper().alterTable();
+    debugPrint('alter!!!!');
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<Modify>(create: (_) => Modify(0)),
-        ChangeNotifierProvider<SelectDel>(
-          create: (_) => SelectDel([]),
-        )
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -155,19 +126,27 @@ class _myTodolistState extends State<myTodolist> {
         children: <Widget>[
           Container(
             alignment: Alignment.topLeft,
-            child: Checkbox(
-                value: _delAll,
-                onChanged: (bool all) {
-                  setState(() {
-                    _delAll = all;
-                  });
-                }),
+            child: Theme(
+              data: ThemeData(unselectedWidgetColor: Colors.amber),
+              child: Checkbox(
+                  value: _delAll,
+                  activeColor: Colors.amber,
+                  onChanged: (bool all) {
+                    setState(() {
+                      _delAll = all;
+                    });
+                  }),
+            ),
           ),
           Container(
             child: RaisedButton(
               child: Text('삭제하기'),
               color: Colors.amber,
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  DBHelper().deleteList();
+                });
+              },
             ),
           ),
         ],
