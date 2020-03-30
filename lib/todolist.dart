@@ -106,21 +106,35 @@ class _myTodolistState extends State<myTodolist> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: floatingMode(),
+    );
+  }
+
+  Widget floatingMode() {
+    if (_addTodo)
+      return FloatingActionButton(
         backgroundColor: Colors.amber,
         onPressed: () {
           setState(() {
-            if (_addTodo)
-              _addTodo = false;
-            else
-              _addTodo = true;
+            _addTodo = false;
           });
           FocusScope.of(context).requestFocus();
         },
-        tooltip: 'Image',
+        tooltip: '입력 취소',
+        child: Icon(Icons.clear),
+      );
+    else
+      return FloatingActionButton(
+        backgroundColor: Colors.amber,
+        onPressed: () {
+          setState(() {
+            _addTodo = true;
+          });
+          FocusScope.of(context).requestFocus();
+        },
+        tooltip: '할 일 추가',
         child: Icon(Icons.add),
-      ),
-    );
+      );
   }
 
   void addTodolist() {
@@ -179,6 +193,8 @@ class _myTodolistState extends State<myTodolist> {
           ),
           Divider(
             height: 50,
+            color: Colors.black,
+            thickness: 2,
           ),
         ],
       );

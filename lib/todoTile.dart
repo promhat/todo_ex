@@ -53,6 +53,7 @@ class _TodotileState extends State<Todotile> {
             trailing: Wrap(spacing: 2, children: <Widget>[
               IconButton(
                 icon: Icon(Icons.edit),
+                color: Colors.black,
                 onPressed: () {
                   modifier.setModify(widget.item.id);
                 },
@@ -146,7 +147,7 @@ class _TodotileState extends State<Todotile> {
     return Row(
       children: <Widget>[
         Container(
-          width: 150,
+          width: 200,
           child: TextField(
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -167,7 +168,7 @@ class _TodotileState extends State<Todotile> {
           ),
         ),
         Container(
-          width: 50,
+          width: 100,
           child: FlatButton(
             child: Text('저장'),
             onPressed: () {
