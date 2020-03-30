@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       home: myTodolist(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -6,8 +6,9 @@ import 'package:khi_todo/todolist.dart';
 import 'package:provider/provider.dart';
 
 class Todotile extends StatefulWidget {
-  Todotile({Key key, this.item}) : super(key: key);
+  Todotile({Key key, this.item, this.delMode}) : super(key: key);
   Todos item;
+  bool delMode;
 
   @override
   _TodotileState createState() => _TodotileState();
@@ -16,6 +17,7 @@ class Todotile extends StatefulWidget {
 class _TodotileState extends State<Todotile> {
   TextEditingController _modycon;
   FocusNode myFocusNode;
+  bool deldel;
 
   @override
   void initState() {
@@ -24,6 +26,7 @@ class _TodotileState extends State<Todotile> {
     myFocusNode = new FocusNode();
     _modycon = TextEditingController(text: widget.item.content);
     _modycon.addListener(checkNum);
+    deldel = false;
   }
 
   void checkNum() {}
@@ -39,6 +42,34 @@ class _TodotileState extends State<Todotile> {
   Widget build(BuildContext context) {
     debugPrint('Tile build!');
 
+    final deleter = Provider.of<SelectDel>(context);
+    if (widget.delMode)
+      return ListTile(
+        leading: Theme(
+          data: ThemeData(
+            unselectedWidgetColor: Colors.amber,
+          ),
+          child: Checkbox(
+            value: deldel,
+            activeColor: Colors.amber,
+            onChanged: (bool temp) {
+              setState(() {
+                deldel = temp;
+              });
+              if (temp)
+                deleter.addDelList(widget.item.id);
+              else
+                deleter.cancleDel(widget.item.id);
+            },
+          ),
+        ),
+        title: justShow(),
+      );
+    else
+      return TodoMode();
+  }
+
+  Widget TodoMode() {
     final modifier = Provider.of<Modify>(context);
     if (widget.item.checked != 1) {
       if (modifier.getModify() == widget.item.id)
@@ -58,15 +89,15 @@ class _TodotileState extends State<Todotile> {
                   modifier.setModify(widget.item.id);
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.clear),
-                color: Colors.amber,
-                onPressed: () {
-                  setState(() {
-                    DBHelper().deleteTodos(widget.item.id);
-                  });
-                },
-              ),
+//              IconButton(
+//                icon: Icon(Icons.clear),
+//                color: Colors.amber,
+//                onPressed: () {
+//                  setState(() {
+//                    DBHelper().deleteTodos(widget.item.id);
+//                  });
+//                },
+//              ),
             ]));
       }
     } else
@@ -80,24 +111,24 @@ class _TodotileState extends State<Todotile> {
               fontStyle: FontStyle.italic,
               color: Colors.amber),
         ),
-        trailing: IconButton(
-          icon: Icon(Icons.clear),
-          color: Colors.amber,
-          onPressed: () {
-            setState(() {
-              DBHelper().deleteTodos(widget.item.id);
-            });
-          },
-        ),
+//        trailing: IconButton(
+//          icon: Icon(Icons.clear),
+//          color: Colors.amber,
+//          onPressed: () {
+//            setState(() {
+//              DBHelper().deleteTodos(widget.item.id);
+//            });
+//          },
+//        ),
       );
   }
 
-  bool checkreturn(Todos todos) {
-    if (todos.checked == 1)
-      return true;
-    else
-      return false;
-  }
+//  bool checkreturn(Todos todos) {
+//    if (todos.checked == 1)
+//      return true;
+//    else
+//      return false;
+//  }
 
   checkList(Todos todo, bool check) {
     if (check)

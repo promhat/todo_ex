@@ -22,10 +22,36 @@ class Modify with ChangeNotifier {
   }
 }
 
+class SelectDel with ChangeNotifier {
+  var delList = [];
+  SelectDel(this.delList);
+
+  addDelList(int del) {
+    if (delList.contains(del)) {
+    } else
+      delList.add(del);
+    debugPrint('delList : ' + delList.toString());
+  }
+
+  cancleDel(int del) {
+    delList.remove(del);
+    debugPrint('delList : ' + delList.toString());
+  }
+
+  DeleteList() {
+    for (int i = 0; i < delList.length; i++)
+      DBHelper().deleteTodos(delList.indexOf(i));
+    notifyListeners();
+    delList.clear();
+  }
+}
+
 class _myTodolistState extends State<myTodolist> {
   final _formkey = GlobalKey<FormState>();
   final _todoController = TextEditingController();
   bool _addTodo;
+  bool _delMode;
+  bool _delAll;
   FocusNode myFocusNode;
 
   @override
@@ -39,6 +65,8 @@ class _myTodolistState extends State<myTodolist> {
   void initState() {
     super.initState();
     _addTodo = false;
+    _delMode = false;
+    _delAll = false;
   }
 
   void deleteSomeList(int id) {
@@ -50,32 +78,32 @@ class _myTodolistState extends State<myTodolist> {
   // 빌드
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'TODO LIST',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+    //프로바이더 사용, 현재 컨텍스트 값을 자식에서 사용하고 변화를 관찰.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<Modify>(create: (_) => Modify(0)),
+        ChangeNotifierProvider<SelectDel>(
+          create: (_) => SelectDel([]),
+        )
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'TODO LIST',
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          actions: <Widget>[
+            trailingMode(),
+          ],
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              setState(() {
-                DBHelper().deleteAllTodos();
-              });
-            },
-          )
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            addTodo(),
-
-            //프로바이더 사용, Modify값을 자식에서 사용하고 변화를 관찰.
-            ChangeNotifierProvider<Modify>(
-              builder: (_) => Modify(0),
-              child: Expanded(
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              // 할 일 추가 텍스트폼 (선택적 출력)
+              addTodo(),
+              AllDelCheck(),
+              // DB 리스트 조회 및 출력
+              Expanded(
                 child: FutureBuilder(
                   future: DBHelper().getAllTodos(),
                   builder: (BuildContext context,
@@ -88,6 +116,7 @@ class _myTodolistState extends State<myTodolist> {
                           Todos item = snapshot.data[index];
                           return Todotile(
                             item: item,
+                            delMode: _delMode,
                           );
                         },
                       );
@@ -100,14 +129,100 @@ class _myTodolistState extends State<myTodolist> {
                   },
                 ),
               ),
-            ),
-            // Add Mode Toggle Button
-            // Click 시 전체 화면을 Add Mode로 다시 렌더
+              // Add Mode Toggle Button
+              // Click 시 전체 화면을 Add Mode로 다시 렌더
+            ],
+          ),
+        ),
+        floatingActionButton: Wrap(
+          children: <Widget>[
+            if (_delMode)
+              SizedBox(
+                width: 5,
+              )
+            else
+              floatingMode(),
           ],
         ),
       ),
-      floatingActionButton: floatingMode(),
     );
+  }
+
+  Widget AllDelCheck() {
+    if (_delMode)
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Checkbox(
+                value: _delAll,
+                onChanged: (bool all) {
+                  setState(() {
+                    _delAll = all;
+                  });
+                }),
+          ),
+          Container(
+            child: RaisedButton(
+              child: Text('삭제하기'),
+              color: Colors.amber,
+              onPressed: () {},
+            ),
+          ),
+        ],
+      );
+    else
+      return SizedBox(
+        height: 2,
+      );
+  }
+
+  Widget trailingMode() {
+    if (_delMode)
+      return Wrap(
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () {
+              if (_delMode)
+                setState(() {
+                  _delMode = false;
+                });
+              else
+                setState(() {
+                  _delMode = true;
+                });
+            },
+          ),
+        ],
+      );
+    else
+      return Wrap(
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () {
+              if (_delMode)
+                setState(() {
+                  _delMode = false;
+                });
+              else
+                setState(() {
+                  _delMode = true;
+                });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                DBHelper().deleteAllTodos();
+              });
+            },
+          ),
+        ],
+      );
   }
 
   Widget floatingMode() {
@@ -118,6 +233,7 @@ class _myTodolistState extends State<myTodolist> {
           setState(() {
             _addTodo = false;
           });
+          _todoController.clear();
           FocusScope.of(context).requestFocus();
         },
         tooltip: '입력 취소',
@@ -200,7 +316,7 @@ class _myTodolistState extends State<myTodolist> {
       );
     } else {
       return SizedBox(
-        height: 30,
+        height: 10,
       );
     }
   }
