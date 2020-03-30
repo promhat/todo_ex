@@ -62,7 +62,7 @@ class _TodotileState extends State<Todotile> {
                 color: Colors.amber,
                 onPressed: () {
                   setState(() {
-                    DBHelper().deleteAllTodos();
+                    DBHelper().deleteTodos(widget.item.id);
                   });
                 },
               ),
@@ -75,7 +75,18 @@ class _TodotileState extends State<Todotile> {
           //showComple()
           widget.item.content,
           style: TextStyle(
-              decoration: TextDecoration.lineThrough, color: Colors.amber),
+              decoration: TextDecoration.lineThrough,
+              fontStyle: FontStyle.italic,
+              color: Colors.amber),
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.clear),
+          color: Colors.amber,
+          onPressed: () {
+            setState(() {
+              DBHelper().deleteTodos(widget.item.id);
+            });
+          },
         ),
       );
   }

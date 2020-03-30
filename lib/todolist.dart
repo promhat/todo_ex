@@ -47,6 +47,82 @@ class _myTodolistState extends State<myTodolist> {
     });
   }
 
+  // 빌드
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'TODO LIST',
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                DBHelper().deleteAllTodos();
+              });
+            },
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            addTodo(),
+
+            //프로바이더 사용, Modify값을 자식에서 사용하고 변화를 관찰.
+            ChangeNotifierProvider<Modify>(
+              builder: (_) => Modify(0),
+              child: Expanded(
+                child: FutureBuilder(
+                  future: DBHelper().getAllTodos(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Todos>> snapshot) {
+                    if (snapshot.hasData) {
+                      debugPrint('snapshot has data');
+                      return ListView.builder(
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          Todos item = snapshot.data[index];
+                          return Todotile(
+                            item: item,
+                          );
+                        },
+                      );
+                    } else {
+                      // 리스트 뷰에 표시할 데이터가 없을 경우 원 모양 인디케이터를 표
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+            // Add Mode Toggle Button
+            // Click 시 전체 화면을 Add Mode로 다시 렌더
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber,
+        onPressed: () {
+          setState(() {
+            if (_addTodo)
+              _addTodo = false;
+            else
+              _addTodo = true;
+          });
+          FocusScope.of(context).requestFocus();
+        },
+        tooltip: 'Image',
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
   void addTodolist() {
     if (_formkey.currentState.validate()) {
       debugPrint(_todoController.text.trim());
@@ -95,6 +171,7 @@ class _myTodolistState extends State<myTodolist> {
                 // 폼 Validator 활용, 입력값이 없을 경우 처리 X
                 RaisedButton(
                   child: Text('저장'),
+                  color: Colors.amber,
                   onPressed: () => addTodolist(),
                 ),
               ],
@@ -110,70 +187,5 @@ class _myTodolistState extends State<myTodolist> {
         height: 30,
       );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'TODO LIST',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            addTodo(),
-
-            //프로바이더 사용, Modify값을 자식에서 사용하고 변화를 관찰.
-            ChangeNotifierProvider<Modify>(
-              builder: (_) => Modify(0),
-              child: Expanded(
-                child: FutureBuilder(
-                  future: DBHelper().getAllTodos(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Todos>> snapshot) {
-                    if (snapshot.hasData) {
-                      debugPrint('snapshot has data');
-                      return ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Todos item = snapshot.data[index];
-                          return Todotile(
-                            item: item,
-                          );
-                        },
-                      );
-                    } else {
-                      // 리스트 뷰에 표시할 데이터가 없을 경우 원 모양 인디케이터를 표
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-            // Add Mode Toggle Button
-            // Click 시 전체 화면을 Add Mode로 다시 렌더
-            FloatingActionButton(
-              backgroundColor: Colors.amber,
-              onPressed: () {
-                setState(() {
-                  if (_addTodo)
-                    _addTodo = false;
-                  else
-                    _addTodo = true;
-                });
-                FocusScope.of(context).requestFocus();
-              },
-              tooltip: 'Image',
-              child: Icon(Icons.add),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
