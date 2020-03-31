@@ -26,7 +26,7 @@ class DBHelper {
     //각 플랫폼 별 경로가 제대로 생성되도록 보장할 수 있는 가장 좋은 방법이다.
     String path = join(await getDatabasesPath(), 'MyTodos.db');
     //db 생성
-    return await openDatabase(path, version: 6, onCreate: (db, version) async {
+    return await openDatabase(path, version: 8, onCreate: (db, version) async {
       await db.execute('''
           CREATE TABLE $TableName(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,10 +36,10 @@ class DBHelper {
           )
         ''');
     }, onUpgrade: (db, oldVersion, newVersion) {
-//      if (oldVersion < newVersion) {
-//        db.execute(
-//            '''ALTER TABLE $TableName ADD COLUMN delkey INTEGER DEFAULT 0''');
-//      }
+      if (oldVersion < newVersion) {
+        db.execute(
+            '''ALTER TABLE $TableName ADD COLUMN delkey INTEGER DEFAULT 0''');
+      }
     });
   }
 

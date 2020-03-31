@@ -135,6 +135,10 @@ class _myTodolistState extends State<myTodolist> {
                     setState(() {
                       _delAll = all;
                     });
+                    if (all)
+                      DBHelper().updateAllDel(1);
+                    else
+                      DBHelper().updateAllDel(0);
                   }),
             ),
           ),
@@ -163,6 +167,7 @@ class _myTodolistState extends State<myTodolist> {
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
+            tooltip: '선택모드',
             onPressed: () {
               if (_delMode)
                 setState(() {
@@ -181,12 +186,15 @@ class _myTodolistState extends State<myTodolist> {
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.check),
+            tooltip: '선택모드',
             onPressed: () {
-              if (_delMode)
+              if (_delMode) {
                 setState(() {
                   _delMode = false;
+
+                  DBHelper().updateAllDel(0);
                 });
-              else
+              } else
                 setState(() {
                   _delMode = true;
                 });
@@ -194,6 +202,7 @@ class _myTodolistState extends State<myTodolist> {
           ),
           IconButton(
             icon: Icon(Icons.delete),
+            tooltip: '전체삭제',
             onPressed: () {
               setState(() {
                 DBHelper().deleteAllTodos();
