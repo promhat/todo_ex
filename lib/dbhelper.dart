@@ -99,6 +99,17 @@ class DBHelper {
     return list;
   }
 
+  Future<int> getCheck() async {
+    final db = await database;
+    var res = await db.rawQuery('SELECT * FROM $TableName WHERE delkey = 0');
+    if (res.isNotEmpty)
+      debugPrint('There is some content');
+    else
+      debugPrint('There is no content');
+    int result = res.isNotEmpty ? 1 : 0;
+    return result;
+  }
+
   //Update
   updateTodos(Todos todos) async {
     final db = await database;

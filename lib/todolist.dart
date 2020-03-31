@@ -46,6 +46,17 @@ class _myTodolistState extends State<myTodolist> {
     _delAll = false;
   }
 
+  getAllCheck() async {
+    final val = await DBHelper().getCheck();
+    //debugPrint('getCheck' + val.toString());
+    setState(() {
+      if (val == 0)
+        _delAll = true;
+      else
+        _delAll = false;
+    });
+  }
+
   // 빌드
   @override
   Widget build(BuildContext context) {
@@ -120,7 +131,8 @@ class _myTodolistState extends State<myTodolist> {
   }
 
   Widget AllDelCheck() {
-    if (_delMode)
+    if (_delMode) {
+      getAllCheck();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -155,7 +167,7 @@ class _myTodolistState extends State<myTodolist> {
           ),
         ],
       );
-    else
+    } else
       return SizedBox(
         height: 2,
       );
@@ -172,6 +184,7 @@ class _myTodolistState extends State<myTodolist> {
               if (_delMode)
                 setState(() {
                   _delMode = false;
+                  DBHelper().updateAllDel(0);
                 });
               else
                 setState(() {
