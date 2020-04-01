@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
@@ -19,23 +19,25 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="Yp9-0p-rAC">
-                                <rect key="frame" x="-5" y="-9" width="431" height="924"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.52320218086242676" green="0.83583354949951172" blue="0.92986947298049927" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="BNo-pU-Udk">
+                                <rect key="frame" x="152" y="393" width="110" height="110"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="BNo-pU-Udk" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Pz4-aM-tXd"/>
+                            <constraint firstItem="BNo-pU-Udk" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="yiN-nj-tc1"/>
+                        </constraints>
                     </view>
                     <value key="contentSizeForViewInPopover" type="size" width="413" height="896"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="76.811594202898561" y="251.11607142857142"/>
+            <point key="canvasLocation" x="76" y="250.52473763118442"/>
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="369.5" height="532"/>
+        <image name="LaunchImage" width="110" height="110"/>
     </resources>
 </document>

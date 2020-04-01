@@ -1,17 +1,31 @@
 {
   "images" : [
     {
-      "filename" : "A5EB84A9-B782-4E0E-9387-DA78BC6031A8_1_105_c.jpeg",
+      "filename" : "ic_launcher.png",
       "idiom" : "universal",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 165,
+          "left" : 164,
+          "right" : 165,
+          "top" : 164
+        },
+        "center" : {
+          "height" : 1,
+          "mode" : "tile",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
       "scale" : "1x"
     },
     {
-      "filename" : "A5EB84A9-B782-4E0E-9387-DA78BC6031A8_1_105_c-1.jpeg",
+      "filename" : "ic_launcher-1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "A5EB84A9-B782-4E0E-9387-DA78BC6031A8_1_105_c-2.jpeg",
+      "filename" : "ic_launcher-2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
