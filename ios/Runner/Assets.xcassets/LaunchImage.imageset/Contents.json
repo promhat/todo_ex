@@ -1,31 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "ic_launcher.png",
+      "filename" : "appstore.png",
       "idiom" : "universal",
-      "resizing" : {
-        "cap-insets" : {
-          "bottom" : 165,
-          "left" : 164,
-          "right" : 165,
-          "top" : 164
-        },
-        "center" : {
-          "height" : 1,
-          "mode" : "tile",
-          "width" : 1
-        },
-        "mode" : "9-part"
-      },
       "scale" : "1x"
     },
     {
-      "filename" : "ic_launcher-1.png",
+      "filename" : "appstore-1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "ic_launcher-2.png",
+      "filename" : "appstore-2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

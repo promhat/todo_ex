@@ -90,8 +90,9 @@ class _myTodolistState extends State<myTodolist> {
                   future: DBHelper().getAllTodos(),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Todos>> snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.data.length != 0) {
                       debugPrint('snapshot has data');
+                      debugPrint(snapshot.data.length.toString());
                       return ListView.builder(
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -105,7 +106,10 @@ class _myTodolistState extends State<myTodolist> {
                     } else {
                       // 리스트 뷰에 표시할 데이터가 없을 경우 원 모양 인디케이터를 표
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: Text(
+                          '버튼을 클릭해 할 일을 입력해주세요.',
+                          style: TextStyle(fontSize: 20),
+                        ),
                       );
                     }
                   },
