@@ -90,19 +90,29 @@ class _myTodolistState extends State<myTodolist> {
                   future: DBHelper().getAllTodos(),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Todos>> snapshot) {
-                    if (snapshot.data.length != 0) {
+                    if (snapshot.hasData) {
                       debugPrint('snapshot has data');
                       debugPrint(snapshot.data.length.toString());
-                      return ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Todos item = snapshot.data[index];
-                          return Todotile(
-                            item: item,
-                            delMode: _delMode,
-                          );
-                        },
-                      );
+
+                      if (snapshot.data.length != 0) {
+                        return ListView.builder(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Todos item = snapshot.data[index];
+                            return Todotile(
+                              item: item,
+                              delMode: _delMode,
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Text(
+                            '버튼을 클릭해 할 일을 입력해주세요.',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        );
+                      }
                     } else {
                       // 리스트 뷰에 표시할 데이터가 없을 경우 원 모양 인디케이터를 표
                       return Center(
